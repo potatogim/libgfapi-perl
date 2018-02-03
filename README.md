@@ -15,8 +15,6 @@ To use it, you can use test code that exists under 't/' directory for reference.
 | [o] | [x] | glfs_setfsgroups() |
 | [x] | [x] | glfs_read_async() |
 | [x] | [x] | glfs_write_async() |
-| [o] | [x] | glfs_readv() |
-| [o] | [x] | glfs_writev() |
 | [x] | [x] | glfs_readv_async() |
 | [x] | [x] | glfs_writev_async() |
 | [x] | [x] | glfs_pread_async() |
