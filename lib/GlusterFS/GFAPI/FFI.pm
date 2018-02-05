@@ -177,12 +177,13 @@ use utf8;
 
 use FFI::Platypus;
 use FFI::Platypus::API;
-use FFI::Platypus::Declare  qw/void string opaque/;
-use FFI::Platypus::Memory   qw/calloc free memcpy/;
-use FFI::Platypus::Buffer   qw/scalar_to_buffer/;
-
+use FFI::Platypus::Declare      qw/void string opaque/;
+use FFI::Platypus::Memory       qw/calloc free memcpy/;
+use FFI::Platypus::Buffer       qw/scalar_to_buffer/;
 use GlusterFS::GFAPI::FFI::Util qw/libgfapi_soname/;
+
 use Carp;
+use Try::Tiny;
 use Data::Dumper;
 
 our $FFI = FFI::Platypus->new(lib => libgfapi_soname());
@@ -204,10 +205,10 @@ sub new
     $FFI->type('record(GlusterFS::GFAPI::FFI::Flock)'     => 'Flock');
 
     # Closure
-    $FFI->type('(glfs_fd_t, ssize_t, opaque)->opaque', 'glfs_io_cbk');
+    $FFI->type('(glfs_fd_t, ssize_t, opaque)->opaque' => 'glfs_io_cbk');
 
     # Type-Caster
-    $FFI->attach_cast('cast_Dirent', 'opaque', 'Dirent');
+    $FFI->attach_cast('cast_Dirent', 'opaque' => 'Dirent');
 
     # Facilities
     $FFI->attach(glfs_init => ['glfs_t'], => 'int');
@@ -440,6 +441,14 @@ sub new
     my %attrs = ();
 
     bless(\%attrs, __PACKAGE__);
+}
+
+sub glfs_io_cbk
+{
+    my $self = @_ > 1 ? shift : undef;
+    my $cbk  = shift;
+
+    return sticky(closure( sub { $cbk->(); } ));
 }
 
 1;

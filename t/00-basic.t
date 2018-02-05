@@ -642,6 +642,52 @@ subtest 'discard' => sub
     diag("error: $!") if ($retval);
 };
 
+# discard_async
+subtest 'discard_async' => sub
+{
+    # :TODO 2018/01/31 10:50:02 by P.G.
+    # we need to verify discarding of this range
+    my $calledback = 0;
+
+    my $retval = GlusterFS::GFAPI::FFI::glfs_discard_async(
+        $fd,
+        0,
+        128,
+        sticky(closure(
+        sub {
+#            my ($fd, $ret, $data) = @_;
+
+            printf "DISCARD_ASYNC\n";
+#            printf "	- FD   : %d\n", $fd;
+#            printf "	- RET  : %d\n", $ret;
+#            printf "	- DATA : %s\n", $data // 'undef';
+
+            $calledback = 1;
+
+            return;
+        }))
+    );
+
+    ok($retval == 0, sprintf('glfs_discard_async(): %d', $retval));
+
+    my $count = 0;
+
+    while ($count < 10)
+    {
+        diag(sprintf("Waiting %ds for callback...", $count+1));
+
+        sleep 1;
+
+        last if ($calledback);
+
+        $count++;
+    }
+
+    ok($calledback, sprintf('	calledback: %d', $calledback));
+
+    diag("error: $!") if ($retval);
+};
+
 # zerofill
 subtest 'zerofill' => sub
 {
