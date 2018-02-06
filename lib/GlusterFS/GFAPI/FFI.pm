@@ -168,7 +168,7 @@ package GlusterFS::GFAPI::FFI;
 BEGIN
 {
     our $AUTHOR  = 'cpan:potatogim';
-    our $VERSION = '0.01';
+    our $VERSION = '0.3';
 }
 
 use strict;
